@@ -125,6 +125,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                         const SizedBox(height: 8),
+<<<<<<< HEAD
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12,
@@ -207,6 +208,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ],
                           ),
                         ),
+=======
+>>>>>>> e18d788 (addition of files)
                       ],
                     ),
                   ),
@@ -242,9 +245,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   setState(() => notificationsEnabled = value);
                                   await _authService
                                       .updateNotificationPreference(
+<<<<<<< HEAD
                                         FirebaseAuth.instance.currentUser!.uid,
                                         value,
                                       );
+=======
+                                    FirebaseAuth.instance.currentUser!.uid,
+                                    value,
+                                  );
+>>>>>>> e18d788 (addition of files)
                                 },
                               ),
                               const Divider(height: 0),
@@ -322,11 +331,107 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 subtitle: const Text("View privacy policy"),
                                 trailing: const Icon(Icons.arrow_forward),
                                 onTap: () {
+<<<<<<< HEAD
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text(
                                         "Privacy policy available online",
                                       ),
+=======
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text("Privacy Policy"),
+                                      content: SingleChildScrollView(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: const [
+                                            Text(
+                                              "Privacy Policy - Kigali City Directory",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            SizedBox(height: 12),
+                                            Text(
+                                              "Last Updated: March 2026",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            SizedBox(height: 16),
+                                            Text(
+                                              "1. Information We Collect",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              "• Email address and authentication information\n"
+                                              "• Listings you create (name, category, location, contact info)\n"
+                                              "• Bookmarked places\n"
+                                              "• App usage information",
+                                            ),
+                                            SizedBox(height: 12),
+                                            Text(
+                                              "2. How We Use Your Information",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              "• To provide and improve our services\n"
+                                              "• To display your listings and bookmarks\n"
+                                              "• To authenticate your account\n"
+                                              "• To send service-related notifications",
+                                            ),
+                                            SizedBox(height: 12),
+                                            Text(
+                                              "3. Data Protection",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              "Your data is stored securely using Firebase. We implement industry-standard security measures to protect your information.",
+                                            ),
+                                            SizedBox(height: 12),
+                                            Text(
+                                              "4. Your Rights",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              "• You can view, edit, or delete your account\n"
+                                              "• You can manage your listings and bookmarks\n"
+                                              "• You can request deletion of your data",
+                                            ),
+                                            SizedBox(height: 12),
+                                            Text(
+                                              "5. Contact Us",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              "If you have privacy concerns, please contact us at: privacy@kigalicitydirectory.rw",
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: const Text("I Agree"),
+                                        ),
+                                      ],
+>>>>>>> e18d788 (addition of files)
                                     ),
                                   );
                                 },

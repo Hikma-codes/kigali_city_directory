@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:url_launcher/url_launcher.dart';
+=======
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import '../providers/bookmarks_provider.dart';
+>>>>>>> e18d788 (addition of files)
 import '../data/rwanda_places.dart';
 
 class DirectoryScreen extends StatefulWidget {
@@ -9,6 +15,10 @@ class DirectoryScreen extends StatefulWidget {
 
 class _DirectoryScreenState extends State<DirectoryScreen> {
   String selectedCategory = "All";
+<<<<<<< HEAD
+=======
+  String searchQuery = '';
+>>>>>>> e18d788 (addition of files)
   final List<String> categories = [
     "All",
     "Café",
@@ -20,6 +30,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
   ];
 
   List<dynamic> getFilteredPlaces() {
+<<<<<<< HEAD
     if (selectedCategory == "All") {
       return rwandaPlaces;
     }
@@ -36,6 +47,22 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
     } else {
       throw 'Could not launch $googleMapsUrl';
     }
+=======
+    var result = rwandaPlaces;
+    if (selectedCategory != "All") {
+      result =
+          result.where((place) => place.category == selectedCategory).toList();
+    }
+    if (searchQuery.isNotEmpty) {
+      result = result
+          .where(
+            (place) =>
+                place.name.toLowerCase().contains(searchQuery.toLowerCase()),
+          )
+          .toList();
+    }
+    return result;
+>>>>>>> e18d788 (addition of files)
   }
 
   @override
@@ -81,6 +108,14 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             child: TextField(
+<<<<<<< HEAD
+=======
+              onChanged: (value) {
+                setState(() {
+                  searchQuery = value.trim();
+                });
+              },
+>>>>>>> e18d788 (addition of files)
               decoration: InputDecoration(
                 hintText: "Search for service",
                 prefixIcon: const Icon(Icons.search),
@@ -250,7 +285,20 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
+<<<<<<< HEAD
                       _launchGoogleMaps(place.lat, place.lng, place.name);
+=======
+                      // Navigate to map and center on this place
+                      Navigator.pushNamed(
+                        context,
+                        '/map',
+                        arguments: {
+                          'latitude': place.lat,
+                          'longitude': place.lng,
+                          'placeName': place.name,
+                        },
+                      );
+>>>>>>> e18d788 (addition of files)
                     },
                     icon: const Icon(Icons.directions),
                     label: const Text("Get Directions"),
@@ -262,6 +310,7 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
                 ),
                 const SizedBox(width: 10),
                 Expanded(
+<<<<<<< HEAD
                   child: ElevatedButton.icon(
                     onPressed: () {
                       // Bookmark functionality
@@ -272,6 +321,60 @@ class _DirectoryScreenState extends State<DirectoryScreen> {
                       backgroundColor: Colors.grey[300],
                       foregroundColor: Colors.black,
                     ),
+=======
+                  child: StreamBuilder<List<String>>(
+                    stream: context.read<BookmarksProvider>().getBookmarks(
+                          FirebaseAuth.instance.currentUser?.uid ?? '',
+                        ),
+                    builder: (context, snap) {
+                      final bookmarked =
+                          snap.data?.contains(place.name) ?? false;
+                      return ElevatedButton.icon(
+                        onPressed: () async {
+                          final userId =
+                              FirebaseAuth.instance.currentUser?.uid ?? '';
+                          if (userId.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please login to bookmark'),
+                              ),
+                            );
+                            return;
+                          }
+                          if (bookmarked) {
+                            await context
+                                .read<BookmarksProvider>()
+                                .removeBookmark(userId, place.name);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Removed bookmark"),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          } else {
+                            await context.read<BookmarksProvider>().addBookmark(
+                                  userId,
+                                  place.name,
+                                );
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Added to bookmarks!"),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          }
+                        },
+                        icon: Icon(
+                          bookmarked ? Icons.bookmark : Icons.bookmark_outline,
+                        ),
+                        label: Text(bookmarked ? "Bookmarked" : "Bookmark"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey[300],
+                          foregroundColor: Colors.black,
+                        ),
+                      );
+                    },
+>>>>>>> e18d788 (addition of files)
                   ),
                 ),
               ],

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:firebase_auth/firebase_auth.dart';
+=======
+>>>>>>> e18d788 (addition of files)
 import '../models/listing.dart';
 import '../services/firestore_service.dart';
 

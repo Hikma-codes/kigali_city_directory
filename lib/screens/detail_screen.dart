@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+<<<<<<< HEAD
 import '../models/place.dart';
+=======
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../models/place.dart';
+import '../providers/bookmarks_provider.dart';
+>>>>>>> e18d788 (addition of files)
 
 class DetailScreen extends StatelessWidget {
   final Place place;
 
   const DetailScreen({super.key, required this.place});
 
+<<<<<<< HEAD
   Future<void> _launchGoogleMaps(double lat, double lng) async {
     final String googleMapsUrl =
         'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
@@ -14,6 +22,15 @@ class DetailScreen extends StatelessWidget {
       await launchUrl(Uri.parse(googleMapsUrl));
     } else {
       throw 'Could not launch $googleMapsUrl';
+=======
+  Future<void> _launchMap(double lat, double lng) async {
+    final url =
+        'https://www.openstreetmap.org/?mlat=$lat&mlon=$lng#map=18/$lat/$lng';
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
+    } else {
+      throw 'Could not launch $url';
+>>>>>>> e18d788 (addition of files)
     }
   }
 
@@ -169,7 +186,11 @@ class DetailScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   ElevatedButton.icon(
+<<<<<<< HEAD
                     onPressed: () => _launchGoogleMaps(place.lat, place.lng),
+=======
+                    onPressed: () => _launchMap(place.lat, place.lng),
+>>>>>>> e18d788 (addition of files)
                     icon: const Icon(Icons.directions),
                     label: const Text("Get Directions"),
                     style: ElevatedButton.styleFrom(
@@ -180,7 +201,25 @@ class DetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   ElevatedButton.icon(
+<<<<<<< HEAD
                     onPressed: () {
+=======
+                    onPressed: () async {
+                      final userId =
+                          FirebaseAuth.instance.currentUser?.uid ?? '';
+                      if (userId.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please login to bookmark'),
+                          ),
+                        );
+                        return;
+                      }
+                      await context.read<BookmarksProvider>().addBookmark(
+                        userId,
+                        place.name,
+                      );
+>>>>>>> e18d788 (addition of files)
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text("Added to bookmarks!"),

@@ -2,10 +2,29 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+<<<<<<< HEAD
 
     match /{document=**} {
       allow read, write: if true;
     }
 
+=======
+    // Listings: any auth'd user can read and create, owner can edit/delete
+    match /listings/{document=**} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth.uid == resource.data.createdBy;
+    }
+    
+    // Users: own user doc only
+    match /users/{uid} {
+      allow read, write: if request.auth.uid == uid;
+    }
+    
+    // Bookmarks: auth'd users can access
+    match /bookmarks/{document=**} {
+      allow read, write: if request.auth != null;
+    }
+>>>>>>> e18d788 (addition of files)
   }
 }

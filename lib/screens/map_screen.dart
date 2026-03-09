@@ -1,7 +1,16 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../data/rwanda_places.dart';
+=======
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../data/rwanda_places.dart';
+import '../providers/bookmarks_provider.dart';
+>>>>>>> e18d788 (addition of files)
 
 class MapScreen extends StatefulWidget {
   @override
@@ -9,14 +18,24 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
+<<<<<<< HEAD
   GoogleMapController? mapController;
   Set<Marker> markers = {};
   LatLng? selectedLocation;
   String? selectedPlaceName;
+=======
+  List<Marker> markers = [];
+  LatLng? selectedLocation;
+  String? selectedPlaceName;
+  late MapController mapController;
+  LatLng userLocation =
+      const LatLng(-1.9441, 30.0619); 
+>>>>>>> e18d788 (addition of files)
 
   @override
   void initState() {
     super.initState();
+<<<<<<< HEAD
     _initializeMarkers();
   }
 
@@ -39,12 +58,51 @@ class _MapScreenState extends State<MapScreen> {
               });
             },
           ),
+=======
+    mapController = MapController();
+    _initializeMarkers();
+
+    // Handle navigation arguments from listing detail screen
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      if (args != null) {
+        final latitude = args['latitude'] as double?;
+        final longitude = args['longitude'] as double?;
+        final placeName = args['placeName'] as String?;
+
+        if (latitude != null && longitude != null) {
+          setState(() {
+            selectedLocation = LatLng(latitude, longitude);
+            selectedPlaceName = placeName ?? 'Location';
+          });
+          _centerOnLocation(latitude, longitude);
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    mapController.dispose();
+    super.dispose();
+  }
+
+  void _initializeMarkers() {
+    markers = rwandaPlaces.map((place) {
+      return Marker(
+        point: LatLng(place.lat, place.lng),
+        width: 40,
+        height: 40,
+        child: GestureDetector(
+>>>>>>> e18d788 (addition of files)
           onTap: () {
             setState(() {
               selectedLocation = LatLng(place.lat, place.lng);
               selectedPlaceName = place.name;
             });
           },
+<<<<<<< HEAD
         ),
       );
     }
@@ -64,6 +122,20 @@ class _MapScreenState extends State<MapScreen> {
     if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
       await launchUrl(Uri.parse(googleMapsUrl));
     }
+=======
+          child: const Icon(
+            Icons.location_on,
+            color: Colors.red,
+            size: 30,
+          ),
+        ),
+      );
+    }).toList();
+  }
+
+  void _centerOnLocation(double lat, double lng) {
+    mapController.move(LatLng(lat, lng), 16.0);
+>>>>>>> e18d788 (addition of files)
   }
 
   @override
@@ -75,6 +147,7 @@ class _MapScreenState extends State<MapScreen> {
       ),
       body: Stack(
         children: [
+<<<<<<< HEAD
           GoogleMap(
             onMapCreated: _onMapCreated,
             initialCameraPosition: CameraPosition(
@@ -87,6 +160,32 @@ class _MapScreenState extends State<MapScreen> {
             scrollGesturesEnabled: true,
             zoomGesturesEnabled: true,
             rotateGesturesEnabled: true,
+=======
+          FlutterMap(
+            mapController: mapController,
+            options: MapOptions(
+              initialCenter: LatLng(-1.9441, 30.0619),
+              initialZoom: 13,
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              ),
+              MarkerLayer(markers: markers),
+              // Navigation polyline (blue line from user to selected location)
+              if (selectedLocation != null)
+                PolylineLayer(
+                  polylines: [
+                    Polyline(
+                      points: [userLocation, selectedLocation!],
+                      color: Colors.blue,
+                      strokeWidth: 4,
+                      isDotted: false,
+                    ),
+                  ],
+                ),
+            ],
+>>>>>>> e18d788 (addition of files)
           ),
           // Bottom panel showing selected place info
           if (selectedPlaceName != null)
@@ -147,6 +246,7 @@ class _MapScreenState extends State<MapScreen> {
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 if (selectedLocation != null) {
+<<<<<<< HEAD
                                   _launchGoogleMaps(
                                     selectedLocation!.latitude,
                                     selectedLocation!.longitude,
@@ -155,6 +255,22 @@ class _MapScreenState extends State<MapScreen> {
                               },
                               icon: const Icon(Icons.directions),
                               label: const Text("Directions"),
+=======
+                                  _centerOnLocation(
+                                    selectedLocation!.latitude,
+                                    selectedLocation!.longitude,
+                                  );
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Map centered on location"),
+                                      duration: Duration(seconds: 2),
+                                    ),
+                                  );
+                                }
+                              },
+                              icon: const Icon(Icons.navigation),
+                              label: const Text("Navigate"),
+>>>>>>> e18d788 (addition of files)
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF0D1B2A),
                                 foregroundColor: Colors.white,
@@ -163,6 +279,7 @@ class _MapScreenState extends State<MapScreen> {
                           ),
                           const SizedBox(width: 8),
                           Expanded(
+<<<<<<< HEAD
                             child: ElevatedButton.icon(
                               onPressed: () {
                                 ScaffoldMessenger.of(context).showSnackBar(
@@ -178,6 +295,83 @@ class _MapScreenState extends State<MapScreen> {
                                 backgroundColor: Colors.grey[300],
                                 foregroundColor: Colors.black,
                               ),
+=======
+                            child: StreamBuilder<List<String>>(
+                              stream: context
+                                  .read<BookmarksProvider>()
+                                  .getBookmarks(
+                                    FirebaseAuth.instance.currentUser?.uid ??
+                                        '',
+                                  ),
+                              builder: (context, snap) {
+                                final bookmarked = selectedPlaceName != null &&
+                                    (snap.data?.contains(selectedPlaceName) ??
+                                        false);
+                                return ElevatedButton.icon(
+                                  onPressed: () async {
+                                    final userId = FirebaseAuth
+                                            .instance.currentUser?.uid ??
+                                        '';
+                                    if (userId.isEmpty) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            'Please login to bookmark',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    if (bookmarked &&
+                                        selectedPlaceName != null) {
+                                      await context
+                                          .read<BookmarksProvider>()
+                                          .removeBookmark(
+                                            userId,
+                                            selectedPlaceName!,
+                                          );
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text("Removed bookmark"),
+                                          duration: Duration(seconds: 2),
+                                        ),
+                                      );
+                                    } else if (selectedPlaceName != null) {
+                                      await context
+                                          .read<BookmarksProvider>()
+                                          .addBookmark(
+                                            userId,
+                                            selectedPlaceName!,
+                                          );
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text("Added to bookmarks!"),
+                                          duration: Duration(seconds: 2),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  icon: Icon(
+                                    bookmarked
+                                        ? Icons.bookmark
+                                        : Icons.bookmark_outline,
+                                  ),
+                                  label: Text(
+                                    bookmarked ? "Bookmarked" : "Bookmark",
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.grey[300],
+                                    foregroundColor: Colors.black,
+                                  ),
+                                );
+                              },
+>>>>>>> e18d788 (addition of files)
                             ),
                           ),
                         ],
@@ -263,10 +457,13 @@ class _MapScreenState extends State<MapScreen> {
       return [];
     }
   }
+<<<<<<< HEAD
 
   @override
   void dispose() {
     mapController?.dispose();
     super.dispose();
   }
+=======
+>>>>>>> e18d788 (addition of files)
 }

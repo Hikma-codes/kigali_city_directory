@@ -2,8 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
+<<<<<<< HEAD
 
 import 'providers/listing_provider.dart';
+=======
+import 'screens/map_screen.dart';
+
+import 'providers/exports.dart';
+>>>>>>> e18d788 (addition of files)
 import 'screens/login_screen.dart';
 
 void main() async {
@@ -17,6 +23,7 @@ void main() async {
 class KigaliApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     const Color darkBlue = Color(0xFF0D1B2A);
     const Color accentAmber = Color(0xFFFFB81C);
 
@@ -32,6 +39,31 @@ class KigaliApp extends StatelessWidget {
           // AppBar Theme
           appBarTheme: const AppBarTheme(
             backgroundColor: darkBlue,
+=======
+    const Color darkBlue = Color.fromARGB(255, 7, 9, 38);
+    const Color accentAmber = Color(0xFFFFB81C);
+
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => ListingProvider()),
+        ChangeNotifierProvider(create: (_) => BookmarksProvider()),
+      ],
+      child: MaterialApp(
+  debugShowCheckedModeBanner: false,
+  title: "Kigali City Directory",
+
+  routes: {
+    '/map': (context) => MapScreen(),
+  },
+        theme: ThemeData(
+          useMaterial3: false,
+          primaryColor: const Color.fromARGB(255, 7, 9, 38),
+          scaffoldBackgroundColor: Colors.white,
+          // AppBar Theme
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color.fromARGB(255, 7, 9, 38),
+>>>>>>> e18d788 (addition of files)
             foregroundColor: Colors.white,
             elevation: 2,
             centerTitle: false,
