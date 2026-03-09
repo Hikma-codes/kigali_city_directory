@@ -1,142 +1,21 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:url_launcher/url_launcher.dart';
-import '../data/rwanda_places.dart';
-=======
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../data/rwanda_places.dart';
+import '../models/listing.dart';
 import '../providers/bookmarks_provider.dart';
->>>>>>> e18d788 (addition of files)
 
 class MapScreen extends StatefulWidget {
+  const MapScreen({super.key});
+
   @override
   State<MapScreen> createState() => _MapScreenState();
 }
 
 class _MapScreenState extends State<MapScreen> {
-<<<<<<< HEAD
-  GoogleMapController? mapController;
-  Set<Marker> markers = {};
-  LatLng? selectedLocation;
-  String? selectedPlaceName;
-=======
-  List<Marker> markers = [];
-  LatLng? selectedLocation;
-  String? selectedPlaceName;
-  late MapController mapController;
-  LatLng userLocation =
-      const LatLng(-1.9441, 30.0619); 
->>>>>>> e18d788 (addition of files)
-
-  @override
-  void initState() {
-    super.initState();
-<<<<<<< HEAD
-    _initializeMarkers();
-  }
-
-  void _initializeMarkers() {
-    Set<Marker> newMarkers = {};
-
-    for (int i = 0; i < rwandaPlaces.length; i++) {
-      final place = rwandaPlaces[i];
-      newMarkers.add(
-        Marker(
-          markerId: MarkerId(place.name),
-          position: LatLng(place.lat, place.lng),
-          infoWindow: InfoWindow(
-            title: place.name,
-            snippet: place.category,
-            onTap: () {
-              setState(() {
-                selectedLocation = LatLng(place.lat, place.lng);
-                selectedPlaceName = place.name;
-              });
-            },
-          ),
-=======
-    mapController = MapController();
-    _initializeMarkers();
-
-    // Handle navigation arguments from listing detail screen
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final args =
-          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-      if (args != null) {
-        final latitude = args['latitude'] as double?;
-        final longitude = args['longitude'] as double?;
-        final placeName = args['placeName'] as String?;
-
-        if (latitude != null && longitude != null) {
-          setState(() {
-            selectedLocation = LatLng(latitude, longitude);
-            selectedPlaceName = placeName ?? 'Location';
-          });
-          _centerOnLocation(latitude, longitude);
-        }
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    mapController.dispose();
-    super.dispose();
-  }
-
-  void _initializeMarkers() {
-    markers = rwandaPlaces.map((place) {
-      return Marker(
-        point: LatLng(place.lat, place.lng),
-        width: 40,
-        height: 40,
-        child: GestureDetector(
->>>>>>> e18d788 (addition of files)
-          onTap: () {
-            setState(() {
-              selectedLocation = LatLng(place.lat, place.lng);
-              selectedPlaceName = place.name;
-            });
-          },
-<<<<<<< HEAD
-        ),
-      );
-    }
-
-    setState(() {
-      markers = newMarkers;
-    });
-  }
-
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
-
-  Future<void> _launchGoogleMaps(double lat, double lng) async {
-    final String googleMapsUrl =
-        'https://www.google.com/maps/search/?api=1&query=$lat,$lng';
-    if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
-      await launchUrl(Uri.parse(googleMapsUrl));
-    }
-=======
-          child: const Icon(
-            Icons.location_on,
-            color: Colors.red,
-            size: 30,
-          ),
-        ),
-      );
-    }).toList();
-  }
-
-  void _centerOnLocation(double lat, double lng) {
-    mapController.move(LatLng(lat, lng), 16.0);
->>>>>>> e18d788 (addition of files)
-  }
+  String? _selectedPlaceName;
 
   @override
   Widget build(BuildContext context) {
@@ -144,326 +23,268 @@ class _MapScreenState extends State<MapScreen> {
       appBar: AppBar(
         title: const Text("Kigali Map"),
         backgroundColor: const Color(0xFF0D1B2A),
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Stack(
         children: [
-<<<<<<< HEAD
-          GoogleMap(
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: CameraPosition(
-              target: LatLng(-1.9441, 30.0619),
-              zoom: 13,
-            ),
-            markers: markers,
-            myLocationEnabled: false,
-            tiltGesturesEnabled: true,
-            scrollGesturesEnabled: true,
-            zoomGesturesEnabled: true,
-            rotateGesturesEnabled: true,
-=======
+          // ── Map ───────────────────────────────────────────────────────────
           FlutterMap(
-            mapController: mapController,
             options: MapOptions(
-              initialCenter: LatLng(-1.9441, 30.0619),
+              initialCenter: const LatLng(-1.9441, 30.0619),
               initialZoom: 13,
+              onTap: (_, __) => setState(() => _selectedPlaceName = null),
             ),
             children: [
               TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                urlTemplate:
+                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                subdomains: const ['a', 'b', 'c'],
+                userAgentPackageName: 'com.example.kigali_city_directory',
               ),
-              MarkerLayer(markers: markers),
-              // Navigation polyline (blue line from user to selected location)
-              if (selectedLocation != null)
-                PolylineLayer(
-                  polylines: [
-                    Polyline(
-                      points: [userLocation, selectedLocation!],
-                      color: Colors.blue,
-                      strokeWidth: 4,
-                      isDotted: false,
+              MarkerLayer(
+                markers: rwandaPlaces.map((place) {
+                  final isSelected = place.name == _selectedPlaceName;
+                  return Marker(
+                    point: LatLng(place.lat, place.lng),
+                    width: 48,
+                    height: 48,
+                    child: GestureDetector(
+                      onTap: () =>
+                          setState(() => _selectedPlaceName = place.name),
+                      child: AnimatedScale(
+                        scale: isSelected ? 1.3 : 1.0,
+                        duration: const Duration(milliseconds: 200),
+                        child: Icon(
+                          Icons.location_on,
+                          color: isSelected
+                              ? const Color(0xFF0D1B2A)
+                              : Colors.red,
+                          size: 36,
+                        ),
+                      ),
                     ),
-                  ],
-                ),
+                  );
+                }).toList(),
+              ),
             ],
->>>>>>> e18d788 (addition of files)
           ),
-          // Bottom panel showing selected place info
-          if (selectedPlaceName != null)
+
+          // ── Place info panel ──────────────────────────────────────────────
+          if (_selectedPlaceName != null)
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
-              child: Container(
-                color: Colors.white,
-                padding: const EdgeInsets.all(16),
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  selectedPlaceName!,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                ..._getPlaceCategory(),
-                              ],
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.close,
-                              color: Colors.black54,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                selectedPlaceName = null;
-                                selectedLocation = null;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                      // Show matching place details
-                      const SizedBox(height: 8),
-                      ..._getPlaceDetails(),
-                      const SizedBox(height: 12),
-                      // Action buttons
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                if (selectedLocation != null) {
-<<<<<<< HEAD
-                                  _launchGoogleMaps(
-                                    selectedLocation!.latitude,
-                                    selectedLocation!.longitude,
-                                  );
-                                }
-                              },
-                              icon: const Icon(Icons.directions),
-                              label: const Text("Directions"),
-=======
-                                  _centerOnLocation(
-                                    selectedLocation!.latitude,
-                                    selectedLocation!.longitude,
-                                  );
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text("Map centered on location"),
-                                      duration: Duration(seconds: 2),
-                                    ),
-                                  );
-                                }
-                              },
-                              icon: const Icon(Icons.navigation),
-                              label: const Text("Navigate"),
->>>>>>> e18d788 (addition of files)
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF0D1B2A),
-                                foregroundColor: Colors.white,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-<<<<<<< HEAD
-                            child: ElevatedButton.icon(
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text("Added to bookmarks!"),
-                                    duration: Duration(seconds: 2),
-                                  ),
-                                );
-                              },
-                              icon: const Icon(Icons.bookmark),
-                              label: const Text("Bookmark"),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.grey[300],
-                                foregroundColor: Colors.black,
-                              ),
-=======
-                            child: StreamBuilder<List<String>>(
-                              stream: context
-                                  .read<BookmarksProvider>()
-                                  .getBookmarks(
-                                    FirebaseAuth.instance.currentUser?.uid ??
-                                        '',
-                                  ),
-                              builder: (context, snap) {
-                                final bookmarked = selectedPlaceName != null &&
-                                    (snap.data?.contains(selectedPlaceName) ??
-                                        false);
-                                return ElevatedButton.icon(
-                                  onPressed: () async {
-                                    final userId = FirebaseAuth
-                                            .instance.currentUser?.uid ??
-                                        '';
-                                    if (userId.isEmpty) {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            'Please login to bookmark',
-                                          ),
-                                        ),
-                                      );
-                                      return;
-                                    }
-                                    if (bookmarked &&
-                                        selectedPlaceName != null) {
-                                      await context
-                                          .read<BookmarksProvider>()
-                                          .removeBookmark(
-                                            userId,
-                                            selectedPlaceName!,
-                                          );
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text("Removed bookmark"),
-                                          duration: Duration(seconds: 2),
-                                        ),
-                                      );
-                                    } else if (selectedPlaceName != null) {
-                                      await context
-                                          .read<BookmarksProvider>()
-                                          .addBookmark(
-                                            userId,
-                                            selectedPlaceName!,
-                                          );
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
-                                        const SnackBar(
-                                          content: Text("Added to bookmarks!"),
-                                          duration: Duration(seconds: 2),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  icon: Icon(
-                                    bookmarked
-                                        ? Icons.bookmark
-                                        : Icons.bookmark_outline,
-                                  ),
-                                  label: Text(
-                                    bookmarked ? "Bookmarked" : "Bookmark",
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.grey[300],
-                                    foregroundColor: Colors.black,
-                                  ),
-                                );
-                              },
->>>>>>> e18d788 (addition of files)
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+              child: _PlaceInfoPanel(
+                placeName: _selectedPlaceName!,
+                onClose: () => setState(() => _selectedPlaceName = null),
               ),
             ),
         ],
       ),
     );
   }
+}
 
-  List<Widget> _getPlaceCategory() {
-    if (selectedPlaceName == null) return [];
+// ─── Place info bottom panel ──────────────────────────────────────────────────
 
-    try {
-      final place = rwandaPlaces.firstWhere((p) => p.name == selectedPlaceName);
-      return [
-        Text(
-          place.category,
-          style: const TextStyle(
-            fontSize: 12,
-            color: Colors.grey,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Row(
-          children: [
-            const Icon(Icons.star, color: Color(0xFFFFB81C), size: 14),
-            const SizedBox(width: 4),
-            Text(
-              "${place.rating} (${place.reviewCount} reviews)",
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-          ],
-        ),
-      ];
-    } catch (e) {
-      return [];
-    }
-  }
+class _PlaceInfoPanel extends StatelessWidget {
+  final String placeName;
+  final VoidCallback onClose;
 
-  List<Widget> _getPlaceDetails() {
-    if (selectedPlaceName == null) return [];
-
-    try {
-      final place = rwandaPlaces.firstWhere((p) => p.name == selectedPlaceName);
-
-      return [
-        Text(
-          place.description,
-          style: const TextStyle(fontSize: 13, color: Colors.black87),
-        ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Icon(Icons.location_on, color: const Color(0xFF0D1B2A), size: 16),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Text(
-                place.address,
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 6),
-        Row(
-          children: [
-            Icon(Icons.phone, color: Colors.green, size: 16),
-            const SizedBox(width: 6),
-            Text(
-              place.phone,
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-          ],
-        ),
-      ];
-    } catch (e) {
-      return [];
-    }
-  }
-<<<<<<< HEAD
+  const _PlaceInfoPanel(
+      {required this.placeName, required this.onClose});
 
   @override
-  void dispose() {
-    mapController?.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    // Find the place from local data
+    final place =
+        rwandaPlaces.firstWhere((p) => p.name == placeName);
+
+    // Convert to a Listing so BookmarkProvider can consume it
+    final listing = Listing(
+      id: place.name, // use name as stable id for local data
+      name: place.name,
+      description: '',
+      category: place.category,
+      address: place.address,
+      phone: place.phone,
+      latitude: place.lat,
+      longitude: place.lng,
+      createdBy: '',
+      timestamp: DateTime.now(),
+    );
+
+    return Consumer<BookmarkProvider>(
+      builder: (context, bookmarkProvider, _) {
+        final isBookmarked = bookmarkProvider.isBookmarked(listing.id);
+
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(20)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 12,
+                offset: const Offset(0, -4),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Drag handle
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Name + close
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      place.name,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: onClose,
+                  ),
+                ],
+              ),
+
+              // Category badge
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0D1B2A).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  place.category,
+                  style: const TextStyle(
+                      fontSize: 12, color: Color(0xFF0D1B2A)),
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              // Address
+              if (place.address.isNotEmpty)
+                _InfoRow(
+                    icon: Icons.location_on, text: place.address),
+
+              // Phone
+              if (place.phone.isNotEmpty)
+                _InfoRow(icon: Icons.phone, text: place.phone),
+
+              const SizedBox(height: 14),
+
+              // Action buttons
+              Row(
+                children: [
+                  // Directions
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.directions, size: 18),
+                      label: const Text("Directions"),
+                      onPressed: () {
+                        final url =
+                            'https://www.google.com/maps/search/?api=1&query=${place.lat},${place.lng}';
+                        launchUrl(Uri.parse(url),
+                            mode: LaunchMode.externalApplication);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0D1B2A),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 8),
+
+                  // Bookmark toggle
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      icon: Icon(
+                        isBookmarked
+                            ? Icons.bookmark
+                            : Icons.bookmark_border,
+                        size: 18,
+                      ),
+                      label: Text(
+                          isBookmarked ? "Bookmarked" : "Bookmark"),
+                      onPressed: () async {
+                        await bookmarkProvider.toggle(listing);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(isBookmarked
+                                  ? "${place.name} removed from bookmarks"
+                                  : "${place.name} added to bookmarks"),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isBookmarked
+                            ? const Color(0xFF0D1B2A)
+                            : Colors.grey.shade200,
+                        foregroundColor: isBookmarked
+                            ? Colors.white
+                            : Colors.black87,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
-=======
->>>>>>> e18d788 (addition of files)
+}
+
+class _InfoRow extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _InfoRow({required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 16, color: Colors.grey.shade600),
+          const SizedBox(width: 8),
+          Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
+        ],
+      ),
+    );
+  }
 }

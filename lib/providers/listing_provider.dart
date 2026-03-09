@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-import 'package:firebase_auth/firebase_auth.dart';
-=======
->>>>>>> e18d788 (addition of files)
 import '../models/listing.dart';
 import '../services/firestore_service.dart';
 
 class ListingProvider extends ChangeNotifier {
   final FirestoreService _firestoreService = FirestoreService();
 
-  Stream<List<Listing>> get listings {
-    return _firestoreService.getListings();
-  }
+  Stream<List<Listing>> get listings => _firestoreService.getListings();
 
-  Stream<List<Listing>> getUserListings(String userId) {
-    return _firestoreService.getUserListings(userId);
-  }
+  Stream<List<Listing>> getUserListings(String userId) =>
+      _firestoreService.getUserListings(userId);
 
   Future<String?> addListing(Listing listing) async {
     try {
@@ -23,7 +16,7 @@ class ListingProvider extends ChangeNotifier {
       notifyListeners();
       return id;
     } catch (e) {
-      print('Error adding listing: $e');
+      debugPrint('Error adding listing: $e');
       return null;
     }
   }
@@ -33,7 +26,7 @@ class ListingProvider extends ChangeNotifier {
       await _firestoreService.updateListing(id, listing);
       notifyListeners();
     } catch (e) {
-      print('Error updating listing: $e');
+      debugPrint('Error updating listing: $e');
     }
   }
 
@@ -42,11 +35,10 @@ class ListingProvider extends ChangeNotifier {
       await _firestoreService.deleteListing(id);
       notifyListeners();
     } catch (e) {
-      print('Error deleting listing: $e');
+      debugPrint('Error deleting listing: $e');
     }
   }
 
-  Stream<List<Listing>> searchListings(String query, String category) {
-    return _firestoreService.searchListings(query, category);
-  }
+  Stream<List<Listing>> searchListings(String query, String category) =>
+      _firestoreService.searchListings(query, category);
 }

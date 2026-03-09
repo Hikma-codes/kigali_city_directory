@@ -9,7 +9,7 @@ class Listing {
   final String phone;
   final double latitude;
   final double longitude;
-  final String createdBy; // User UID
+  final String createdBy;
   final DateTime timestamp;
   final double rating;
   final int reviewCount;
@@ -29,9 +29,32 @@ class Listing {
     this.reviewCount = 0,
   });
 
-  Map<String, dynamic> toMap() {
+  /// Used by firestore_service.dart (snapshots with DocumentSnapshot)
+  factory Listing.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return Listing.fromMap(data, doc.id);
+  }
+
+  /// Used by firestore_service.dart (raw map + id)
+  factory Listing.fromMap(Map<String, dynamic> data, String id) {
+    return Listing(
+      id: id,
+      name: data['name'] ?? '',
+      description: data['description'] ?? '',
+      category: data['category'] ?? 'General',
+      address: data['address'] ?? '',
+      phone: data['phone'] ?? '',
+      latitude: (data['latitude'] ?? -1.9441).toDouble(),
+      longitude: (data['longitude'] ?? 30.0619).toDouble(),
+      createdBy: data['createdBy'] ?? '',
+      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      rating: (data['rating'] ?? 0.0).toDouble(),
+      reviewCount: (data['reviewCount'] ?? 0) as int,
+    );
+  }
+
+  Map<String, dynamic> toFirestore() {
     return {
-      'id': id,
       'name': name,
       'description': description,
       'category': category,
@@ -40,29 +63,10 @@ class Listing {
       'latitude': latitude,
       'longitude': longitude,
       'createdBy': createdBy,
-      'timestamp': timestamp,
+      'timestamp': Timestamp.fromDate(timestamp),
       'rating': rating,
       'reviewCount': reviewCount,
     };
-  }
-
-  factory Listing.fromMap(Map<String, dynamic> map, String docId) {
-    return Listing(
-      id: docId,
-      name: map['name'] ?? '',
-      description: map['description'] ?? '',
-      category: map['category'] ?? '',
-      address: map['address'] ?? '',
-      phone: map['phone'] ?? '',
-      latitude: (map['latitude'] ?? 0.0).toDouble(),
-      longitude: (map['longitude'] ?? 0.0).toDouble(),
-      createdBy: map['createdBy'] ?? '',
-      timestamp: map['timestamp'] is Timestamp
-          ? (map['timestamp'] as Timestamp).toDate()
-          : DateTime.now(),
-      rating: (map['rating'] ?? 0.0).toDouble(),
-      reviewCount: map['reviewCount'] ?? 0,
-    );
   }
 
   Listing copyWith({

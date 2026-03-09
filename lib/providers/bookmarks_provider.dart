@@ -1,18 +1,31 @@
 import 'package:flutter/material.dart';
-import '../services/firestore_service.dart';
+import '../models/listing.dart';
 
-class BookmarksProvider extends ChangeNotifier {
-  final FirestoreService _firestoreService = FirestoreService();
+class BookmarkProvider extends ChangeNotifier {
+  final List<Listing> _bookmarks = [];
 
-  Stream<List<String>> getBookmarks(String userId) {
-    return _firestoreService.getBookmarks(userId);
+  List<Listing> get bookmarks => List.unmodifiable(_bookmarks);
+
+  bool isBookmarked(String id) => _bookmarks.any((l) => l.id == id);
+
+  Future<void> toggle(Listing listing) async {
+    if (isBookmarked(listing.id)) {
+      _bookmarks.removeWhere((l) => l.id == listing.id);
+    } else {
+      _bookmarks.add(listing);
+    }
+    notifyListeners();
   }
 
-  Future<void> addBookmark(String userId, String placeName) async {
-    await _firestoreService.addBookmark(userId, placeName);
+  void add(Listing listing) {
+    if (!isBookmarked(listing.id)) {
+      _bookmarks.add(listing);
+      notifyListeners();
+    }
   }
 
-  Future<void> removeBookmark(String userId, String placeName) async {
-    await _firestoreService.removeBookmark(userId, placeName);
+  void remove(String id) {
+    _bookmarks.removeWhere((l) => l.id == id);
+    notifyListeners();
   }
 }

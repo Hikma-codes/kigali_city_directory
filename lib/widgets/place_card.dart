@@ -5,7 +5,7 @@ import '../screens/detail_screen.dart';
 class PlaceCard extends StatelessWidget {
   final Place place;
 
-  const PlaceCard({required this.place});
+  const PlaceCard({super.key, required this.place});
 
   @override
   Widget build(BuildContext context) {
